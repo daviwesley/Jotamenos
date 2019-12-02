@@ -5,8 +5,8 @@ start : main_class class_declaration*
 !main_class : "class" IDENTIFIER "{" reserved_string reserved_string reserved_string reserved_string "(" reserved_string "[" "]" IDENTIFIER ")" "{" statement "}" "}"
 class_declaration : "class" IDENTIFIER ( "extends"i IDENTIFIER )? "{" ( var_declaration )* ( method_declaration )* "}"
 var_declaration : type IDENTIFIER ";"
-method_declaration : "public"i type IDENTIFIER "(" ( type IDENTIFIER ( "," type IDENTIFIER )* )? ")" "{" ( var_declaration )* ( statement )* "return" expression ";" "}"
-type : "int [ ]"
+method_declaration : reserved_string type IDENTIFIER "(" ( type IDENTIFIER ( "," type IDENTIFIER )* )? ")" "{" ( var_declaration )* ( statement )* "return" expression ";" "}"
+!type : "int [ ]"
        | "boolean"
        | "int"
        | IDENTIFIER
@@ -31,15 +31,17 @@ type : "int [ ]"
             | "(" expression ")"
 IDENTIFIER:  /[a-zA-Z_][0-9a-zA-Z_]*/
 !reserved_string: "int" | "public" | "void" | "main" | "static"
-COMMENT : "/*"  /.*?/ "*/"  
+INTEGRAL_TYPE: "int" | "byte" | "short"
+COMMENT : "/*"  /.*?/ "*/"
+DIGIT: /\d+/
 %import common.WORD
-%import common.DIGIT
 %import common.ESCAPED_STRING
 %import common.WS
 
 %ignore WS
 %ignore ESCAPED_STRING
 %ignore COMMENT
+%ignore " "
 '''
 
 test_code = '''class Teste{
@@ -50,6 +52,6 @@ test_code = '''class Teste{
 }
 '''
 
-j = Lark(grammar, debug=True)
+j = Lark(grammar)
 parse = j.parse(test_code)
 print(parse)
